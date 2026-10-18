@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.ExitToApp
@@ -26,6 +27,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -37,12 +39,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import coil.compose.SubcomposeAsyncImage
 import java.io.File
@@ -57,7 +57,6 @@ fun ProfileDialog(
 ) {
     val context = LocalContext.current
 
-    // Automatically derive name from the email address (e.g., "alex@gmail.com" -> "Alex")
     val derivedName = remember(userEmail) {
         if (userEmail.contains("@")) {
             userEmail.substringBefore("@")
@@ -122,19 +121,29 @@ fun ProfileDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Profile", fontWeight = FontWeight.Bold) },
+        shape = RoundedCornerShape(24.dp),
+        title = {
+            Text(
+                text = "✨ User Profile",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        },
         text = {
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Spacer(modifier = Modifier.height(8.dp))
+
                 // Profile Avatar Container
                 Box(
                     modifier = Modifier
                         .size(100.dp)
                         .clip(CircleShape)
-                        .background(Color(0xFF2A2A3D))
-                        .border(2.dp, Color(0xFFFFC107), CircleShape),
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                        .border(3.dp, MaterialTheme.colorScheme.primary, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     if (selectedImageUri != null && selectedImageUri.toString().isNotBlank()) {
@@ -146,18 +155,18 @@ fun ProfileDialog(
                             error = {
                                 Icon(
                                     imageVector = Icons.Default.Face,
-                                    contentDescription = "Fallback Male Head",
-                                    modifier = Modifier.size(64.dp),
-                                    tint = Color(0xFFFFC107)
+                                    contentDescription = "Fallback Profile",
+                                    modifier = Modifier.size(60.dp),
+                                    tint = MaterialTheme.colorScheme.primary
                                 )
                             }
                         )
                     } else {
                         Icon(
                             imageVector = Icons.Default.Face,
-                            contentDescription = "Default Male Head Profile",
-                            modifier = Modifier.size(64.dp),
-                            tint = Color(0xFFFFC107)
+                            contentDescription = "Default Profile",
+                            modifier = Modifier.size(60.dp),
+                            tint = MaterialTheme.colorScheme.primary
                         )
                     }
                 }
@@ -168,27 +177,39 @@ fun ProfileDialog(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    OutlinedButton(onClick = { galleryLauncher.launch("image/*") }) {
+                    OutlinedButton(
+                        onClick = { galleryLauncher.launch("image/*") },
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
                         Icon(Icons.Default.PhotoLibrary, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Gallery", fontSize = 12.sp)
+                        Text("Gallery")
                     }
 
-                    OutlinedButton(onClick = { launchCamera() }) {
+                    OutlinedButton(
+                        onClick = { launchCamera() },
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
                         Icon(Icons.Default.CameraAlt, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Camera", fontSize = 12.sp)
+                        Text("Camera")
                     }
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
-                // Only show the derived user name (omitting the email address)
+                // Username Display
                 Text(
                     text = derivedName,
-                    fontSize = 22.sp,
+                    style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black // Specified black color text for the username display
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+
+                Text(
+                    text = userEmail,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -198,20 +219,29 @@ fun ProfileDialog(
                         onLogout()
                         onDismiss()
                     },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F))
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                        contentColor = MaterialTheme.colorScheme.onErrorContainer
+                    )
                 ) {
-                    Icon(Icons.Default.ExitToApp, contentDescription = null)
+                    Icon(Icons.Default.ExitToApp, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Logout", color = Color.White)
+                    Text("Logout", fontWeight = FontWeight.Bold)
                 }
             }
         },
         confirmButton = {
-            Button(onClick = {
-                onSaveProfile(derivedName, selectedImageUri?.toString())
-                onDismiss()
-            }) {
+            Button(
+                onClick = {
+                    onSaveProfile(derivedName, selectedImageUri?.toString())
+                    onDismiss()
+                },
+                shape = RoundedCornerShape(10.dp)
+            ) {
                 Text("Save")
             }
         },

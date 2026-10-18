@@ -2,7 +2,6 @@ package com.example.todo.presentation.compose
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -35,7 +35,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -51,17 +53,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.compose.SubcomposeAsyncImage
-import com.example.todo.R
 import com.example.todo.domain.model.ToDo
 import com.example.todo.presentation.uistate.Screen
 import com.example.todo.presentation.viewmodel.AuthViewModel
@@ -158,9 +156,9 @@ fun ToDoListScreen(
                 title = {
                     Text(
                         text = if (uiState.currentScreen == Screen.HOME) "✨ My Tasks" else "🏆 Completed",
-                        fontSize = 22.sp,
+                        style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFFFFC107)
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 },
                 actions = {
@@ -178,7 +176,7 @@ fun ToDoListScreen(
                                     Icon(
                                         imageVector = Icons.Default.Face,
                                         contentDescription = "Fallback Profile",
-                                        tint = Color(0xFFFFC107),
+                                        tint = MaterialTheme.colorScheme.primary,
                                         modifier = Modifier.size(32.dp)
                                     )
                                 }
@@ -187,19 +185,20 @@ fun ToDoListScreen(
                             Icon(
                                 imageVector = Icons.Default.Face,
                                 contentDescription = "Profile",
-                                tint = Color(0xFFFFC107),
+                                tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(32.dp)
                             )
                         }
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF1E1E2C))
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                )
             )
         },
         bottomBar = {
             BottomAppBar(
-                containerColor = Color(0xFF1E1E2C),
-                // DO NOT add .imePadding() here!
+                containerColor = MaterialTheme.colorScheme.surface,
                 modifier = Modifier.navigationBarsPadding()
             ) {
                 Row(
@@ -213,12 +212,12 @@ fun ToDoListScreen(
                             Icon(
                                 Icons.Default.Home,
                                 contentDescription = "Home",
-                                tint = if (isHomeActive) Color(0xFFFFC107) else Color.Gray
+                                tint = if (isHomeActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                             )
                             Text(
                                 "Home",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = if (isHomeActive) Color(0xFFFFC107) else Color.Gray
+                                style = MaterialTheme.typography.labelMedium,
+                                color = if (isHomeActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                             )
                         }
                     }
@@ -232,9 +231,10 @@ fun ToDoListScreen(
                                     submitTask()
                                 }
                             },
-                            modifier = Modifier.size(48.dp),
-                            containerColor = Color(0xFF673AB7),
-                            contentColor = Color.White
+                            modifier = Modifier.size(52.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
                         ) {
                             Icon(
                                 imageVector = if (isInputVisible || uiState.editingTodo != null) Icons.Default.Check else Icons.Default.Add,
@@ -242,7 +242,7 @@ fun ToDoListScreen(
                             )
                         }
                     } else {
-                        Spacer(modifier = Modifier.size(48.dp))
+                        Spacer(modifier = Modifier.size(52.dp))
                     }
 
                     val isCompletedActive = uiState.currentScreen == Screen.COMPLETED
@@ -251,12 +251,12 @@ fun ToDoListScreen(
                             Icon(
                                 Icons.Default.CheckCircle,
                                 contentDescription = "Completed",
-                                tint = if (isCompletedActive) Color(0xFFFFC107) else Color.Gray
+                                tint = if (isCompletedActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                             )
                             Text(
                                 "Completed",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = if (isCompletedActive) Color(0xFFFFC107) else Color.Gray
+                                style = MaterialTheme.typography.labelMedium,
+                                color = if (isCompletedActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                             )
                         }
                     }
@@ -264,18 +264,12 @@ fun ToDoListScreen(
             }
         }
     ) { paddingValues ->
-        Box(
+        Surface(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(paddingValues),
+            color = MaterialTheme.colorScheme.background
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.app_bg),
-                contentDescription = "Background",
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
-
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -289,18 +283,23 @@ fun ToDoListScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .focusRequester(focusRequester),
-                            label = { Text(if (uiState.editingTodo != null) "Edit task" else "Enter task") },
+                            label = { Text(if (uiState.editingTodo != null) "Edit task" else "What needs to be done?") },
                             singleLine = true,
+                            shape = RoundedCornerShape(12.dp),
                             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                             keyboardActions = KeyboardActions(
                                 onDone = { submitTask() }
+                            ),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
                             ),
                             trailingIcon = {
                                 IconButton(onClick = { showDateTimePickerAndSubmit() }) {
                                     Icon(
                                         Icons.Default.DateRange,
                                         contentDescription = "Pick Date/Time",
-                                        tint = if (selectedDueDateMillis != null) Color(0xFFFFC107) else Color.White
+                                        tint = if (selectedDueDateMillis != null) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                                     )
                                 }
                             }
@@ -311,7 +310,11 @@ fun ToDoListScreen(
 
                 if (displayedItems.isEmpty()) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("No tasks found!", color = Color.White, fontSize = 18.sp)
+                        Text(
+                            text = if (uiState.currentScreen == Screen.HOME) "🎉 No pending tasks!" else "📭 No completed tasks yet.",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+                        )
                     }
                 } else {
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -331,20 +334,18 @@ fun ToDoListScreen(
             AlertDialog(
                 onDismissRequest = { showTimeRequiredAlert = false },
                 title = { Text("Time Required", fontWeight = FontWeight.Bold) },
-                text = { Text("Please choose time for the task before adding it to the list.") },
+                text = { Text("Please choose a due date and time for the task before adding it.") },
                 confirmButton = {
-                    Button(onClick = {
-                        showTimeRequiredAlert = false
-                        showDateTimePickerAndSubmit()
-                    }) {
+                    Button(
+                        onClick = {
+                            showTimeRequiredAlert = false
+                            showDateTimePickerAndSubmit()
+                        },
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
                         Text("Choose Time")
                     }
-                },
-//                dismissButton = {
-//                    Button(onClick = { showTimeRequiredAlert = false }) {
-//                        Text("Cancel")
-//                    }
-//                }
+                }
             )
         }
 
@@ -360,6 +361,7 @@ fun ToDoListScreen(
                 onDelete = { viewModel.deleteTodo(task) }
             )
         }
+
         if (showProfileDialog) {
             ProfileDialog(
                 currentImageUri = authState.profileImageUri,

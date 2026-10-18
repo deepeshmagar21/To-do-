@@ -19,10 +19,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.todo.domain.model.ToDo
 import kotlinx.coroutines.delay
 
@@ -47,7 +45,10 @@ fun ToDoListRow(
             .fillMaxWidth()
             .padding(vertical = 4.dp)
             .clickable { onClick() },
-        colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f))
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
             modifier = Modifier
@@ -59,7 +60,8 @@ fun ToDoListRow(
                 Text(
                     text = item.title,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
 
                 if (item.dueDateMillis != null && !item.isDone) {
@@ -67,8 +69,8 @@ fun ToDoListRow(
                     val remainingMillis = item.dueDateMillis - currentTime
                     Text(
                         text = formatRemainingTime(remainingMillis),
-                        fontSize = 12.sp,
-                        color = if (remainingMillis <= 0) Color.Red else Color(0xFFE65100),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = if (remainingMillis <= 0) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary,
                         fontWeight = FontWeight.SemiBold
                     )
                 }
